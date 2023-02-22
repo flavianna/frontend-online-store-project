@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Header from '../components/Header';
+import ItemCard from '../components/ItemCard';
+import Footer from '../components/Footer';
 
 import {
   getCategories,
@@ -13,13 +15,20 @@ class PaginaPrincipal extends React.Component {
     categoriaID: '',
     categorias: [],
     itensLoja: [],
-    mostrarItens: false,
+    mostrarItens: true,
     carrinho: [],
+    carrinhoQuantidade: 0,
+    categoriaAtiva: '',
   };
 
   async componentDidMount() {
     this.setState({ categorias: await getCategories() });
   }
+
+  calcularCarrinhoQuantidade = () => {
+    const { carrinho } = this.state;
+    return carrinho.reduce((quantidade, item) => quantidade + item.quantidade, 0);
+  };
 
   handleChange = ({ target }) => {
     const { name } = target;
@@ -28,11 +37,6 @@ class PaginaPrincipal extends React.Component {
     this.setState({
       [name]: value,
     });
-  };
-
-  enableBtn = () => {
-    const { history } = this.props;
-    history.push('/carrinhodecompras');
   };
 
   renderizaItens = async () => {
@@ -46,7 +50,7 @@ class PaginaPrincipal extends React.Component {
   };
 
   clickCategoria = (item) => {
-    this.setState({ categoriaID: item }, () => {
+    this.setState({ categoriaID: item, categoriaAtiva: 'btn-category-active' }, () => {
       this.renderizaItens();
     });
   };
@@ -54,6 +58,7 @@ class PaginaPrincipal extends React.Component {
   addCarrinhoAsync = () => {
     const { carrinho } = this.state;
     localStorage.setItem('carrinhoLocalStorage', JSON.stringify(carrinho));
+    this.setState({ carrinhoQuantidade: this.calcularCarrinhoQuantidade() });
   };
 
   addCarrinho = (item) => {
@@ -64,84 +69,56 @@ class PaginaPrincipal extends React.Component {
   };
 
   render() {
-    const { pesquisa, categorias, itensLoja, mostrarItens } = this.state;
+    const { pesquisa,
+      categorias,
+      itensLoja,
+      mostrarItens,
+      carrinhoQuantidade } = this.state;
     return (
       <>
-        <div>
-          <input
-            data-testid="query-input"
-            value={ pesquisa }
-            name="pesquisa"
-            onChange={ this.handleChange }
-            type="text"
-          />
-          <button
-            onClick={ this.renderizaItens }
-            type="button"
-            data-testid="query-button"
-          >
-            Pesquisar
-          </button>
-          <div>
+        <Header
+          pesquisa={ pesquisa }
+          onPesquisaChange={ this.handleChange }
+          onPesquisaSubmit={ this.renderizaItens }
+          carrinhoQuantidade={ carrinhoQuantidade }
+        />
+        <ul className="categorias-container">
+          <hr className="mt-2 mb-2" />
+          <h1 className="font-bold break-before-column">Explore as Categorias</h1>
+          {categorias.map((item) => (
             <button
-              data-testid="shopping-cart-button"
+              key={ item.id }
+              onClick={ () => this.clickCategoria(item.id) }
+              className={ this.state.categoriaID === item.id
+                ? this.state.categoriaAtiva : '' }
+              data-testid="category"
+              name={ item.name }
               type="button"
-              name="btCarrinho"
-              onClick={ this.enableBtn }
             >
-              Carrinho
+              {item.name}
             </button>
-          </div>
-        </div>
-        {categorias.map((item) => (
-          <button
-            onClick={ () => this.clickCategoria(item.id) }
-            data-testid="category"
-            name={ item.name }
-            type="button"
-            key={ item.id }
-          >
-            {item.name}
-          </button>
-        ))}
-        {itensLoja.length > 1 && mostrarItens === true
-          ? itensLoja.map((item) => (
-            <>
-              <Link
-                className="lista-produtos"
+          ))}
+
+        </ul>
+
+        <div className="items-container flex flex-wrap items-center bg-gray-200">
+          {itensLoja.length > 1 && mostrarItens === true ? (
+            itensLoja.map((item) => (
+              <ItemCard
                 key={ item.id }
-                to={ `/produtodetalhes/${item.id}` }
-                data-testid="product-detail-link"
-              >
-                <div data-testid="product">
-                  {' '}
-                  <p>{item.title}</p>
-                  <img alt="Produto" src={ item.thumbnail } />
-                  <p>{item.price}</p>
-                </div>
-
-              </Link>
-              <button
-                type="button"
-                data-testid="product-add-to-cart"
-                onClick={ () => this.addCarrinho(item) }
-              >
-                Comprar
-
-              </button>
-            </>
-          )) : (
-            <p>Nenhum produto foi encontrado</p>
+                item={ item }
+                onAddToCart={ this.addCarrinho }
+              />
+            ))
+          ) : (
+            <p>Nenhum produto foi encontrado.</p>
           )}
-
-        {pesquisa.length === 0 ? (
-          <p data-testid="home-initial-message">
-            Digite algum termo de pesquisa ou escolha uma categoria.
-          </p>
-        ) : (
-          <p />
-        )}
+        </div>
+        <footer className=" bottom-0 w-full">
+          <Footer />
+        </footer>
       </>
+
     );
   }
 }
