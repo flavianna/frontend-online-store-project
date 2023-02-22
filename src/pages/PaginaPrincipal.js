@@ -74,8 +74,9 @@ class PaginaPrincipal extends React.Component {
       itensLoja,
       mostrarItens,
       carrinhoQuantidade } = this.state;
+    const { categoriaID, categoriaAtiva } = this.state;
     return (
-      <>
+      <div>
         <Header
           pesquisa={ pesquisa }
           onPesquisaChange={ this.handleChange }
@@ -89,8 +90,8 @@ class PaginaPrincipal extends React.Component {
             <button
               key={ item.id }
               onClick={ () => this.clickCategoria(item.id) }
-              className={ this.state.categoriaID === item.id
-                ? this.state.categoriaAtiva : '' }
+              className={ categoriaID === item.id
+                ? categoriaAtiva : '' }
               data-testid="category"
               name={ item.name }
               type="button"
@@ -117,8 +118,8 @@ class PaginaPrincipal extends React.Component {
         <footer className=" bottom-0 w-full">
           <Footer />
         </footer>
-      </>
 
+      </div>
     );
   }
 }

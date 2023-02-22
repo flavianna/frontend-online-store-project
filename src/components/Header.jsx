@@ -93,4 +93,9 @@ Header.propTypes = {
   carrinhoQuantidade: PropTypes.number.isRequired,
 };
 
+Header.defaultProps = {
+  onPesquisaChange: () => {},
+  onPesquisaSubmit: () => {},
+};
+
 export default Header;

@@ -22,9 +22,10 @@ export default class CarrinhoDeCompras extends Component {
     .reduce((total, item) => total + item.price * item.quantidade, 0);
 
   addItem = (item) => {
+    const magicNumber = 1;
     const { carrinho } = this.state;
     const index = carrinho.findIndex((e) => e.id === item.id);
-    if (index !== -1) {
+    if (index !== -magicNumber) {
       carrinho[index].quantidade += 1;
     } else {
       carrinho.push({ ...item, quantidade: 1 });
@@ -38,7 +39,7 @@ export default class CarrinhoDeCompras extends Component {
   decreaseItem = (item) => {
     const { carrinho } = this.state;
     const index = carrinho.findIndex((e) => e.id === item.id);
-    if (index !== -1) {
+    if (index !== -magicNumber) {
       carrinho[index].quantidade -= 1;
       if (carrinho[index].quantidade === 0) {
         carrinho.splice(index, 1);

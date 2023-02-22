@@ -27,7 +27,12 @@ function ItemCard({ item, onAddToCart }) {
 }
 
 ItemCard.propTypes = {
-  item: PropTypes.object.isRequired,
+  item: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    thumbnail: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+  }).isRequired,
   onAddToCart: PropTypes.func.isRequired,
 };
 
