@@ -37,13 +37,13 @@ export default class CarrinhoDeCompras extends Component {
   };
 
   decreaseItem = (item) => {
+    // const magicNumber = 1;
     const { carrinho } = this.state;
     const index = carrinho.findIndex((e) => e.id === item.id);
-    if (index !== -magicNumber) {
-      carrinho[index].quantidade -= 1;
-      if (carrinho[index].quantidade === 0) {
-        carrinho.splice(index, 1);
-      }
+    if (index >= 0) {
+      if (carrinho[index].quantidade > 1) {
+        carrinho[index].quantidade -= 1; // diminui a quantidade em 1
+      } // não precisa do else, já que se a quantidade for igual a 1 não faz nada
       const total = this.calcularTotal(carrinho);
       this.setState({ carrinho, total }, () => {
         localStorage.setItem('carrinhoLocalStorage', JSON.stringify(carrinho));
